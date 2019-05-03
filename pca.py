@@ -17,7 +17,17 @@
 # 
 # To find the direction of maximum variance, we will need to develop a mathematical formula that can help us calculate the variance of the data after it has been projected along a certain direction so that we can search for the direction of maximum variance by optimizing over that formula. Let's calculate the variance after projection of the data along $\mathbf w$. We know that variance of the values $z_i, i=1...N$ is the expected (average) value of the squared deviation $(z_i-\mu_z)$ around the mean value $\mu_z = \frac{1}{N}\sum_{i=1}^{N}z_i=\frac{1}{N}\sum_{i=1}^{N}\mathbf w^T\mathbf x_i=\mathbf w^T\frac{1}{N}\sum_{i=1}^{N}\mathbf x_i=\mathbf w^T\mu_x$ where $\mathbf{\mu_x}=\frac{1}{N}\sum_{i=1}^{N}\mathbf x_i$ is the $d$-dimensional vector of average values of all data points along each of the $d$ data dimensions. Therefore,
 # 
-# $var(z)=var(\mathbf w^T \mathbf x)=\frac{1}{N}\sum_{i=1}^{N}[(\mathbf w^T \mathbf x_i-\mathbf w^T\mathbf\mu_x)^2]=\frac{1}{N}\sum_{i=1}^{N}[(\mathbf w^T\mathbf x_i-\mathbf w^T\mathbf\mu_x)(\mathbf w^T\mathbf x_i-\mathbf w^T\mathbf\mu_x)]=\frac{1}{N}\sum_{i=1}^{N}[(\mathbf w^T\mathbf x_i-\mathbf w^T\mathbf\mu_x)(\mathbf x_i^T\mathbf w-\mathbf \mu_x^T \mathbf w)]=\frac{1}{N}\sum_{i=1}^{N}[\mathbf w^T(\mathbf x_i-\mathbf \mu_x)(\mathbf x_i-\mathbf \mu_x)^T\mathbf w]=\mathbf w^T\frac{1}{N}\sum_{i=1}^{N}[(\mathbf x_i-\mathbf \mu_x)(\mathbf x_i-\mathbf \mu_x)^T]\mathbf w=\mathbf w^T\mathbf C \mathbf w$
+# $var(z)=var(\mathbf w^T \mathbf x)=\frac{1}{N}\sum_{i=1}^{N}[(\mathbf w^T \mathbf x_i-\mathbf w^T\mathbf\mu_x)^2]$
+# 
+# $=\frac{1}{N}\sum_{i=1}^{N}[(\mathbf w^T\mathbf x_i-\mathbf w^T\mathbf\mu_x)(\mathbf w^T\mathbf x_i-\mathbf w^T\mathbf\mu_x)]$
+# 
+# $=\frac{1}{N}\sum_{i=1}^{N}[(\mathbf w^T\mathbf x_i-\mathbf w^T\mathbf\mu_x)(\mathbf x_i^T\mathbf w-\mathbf \mu_x^T \mathbf w)]$
+# 
+# $=\frac{1}{N}\sum_{i=1}^{N}[\mathbf w^T(\mathbf x_i-\mathbf \mu_x)(\mathbf x_i-\mathbf \mu_x)^T\mathbf w]$
+# 
+# $=\mathbf w^T\frac{1}{N}\sum_{i=1}^{N}[(\mathbf x_i-\mathbf \mu_x)(\mathbf x_i-\mathbf \mu_x)^T]\mathbf w$
+# 
+# $=\mathbf w^T\mathbf C \mathbf w$
 # 
 # Here, $\mathbf C=\frac{1}{N}\sum_{i=1}^{N}[(\mathbf x_i-\mathbf \mu_x)(\mathbf x_i-\mathbf \mu_x)^T]$ is the $d \times d$ sized "covariance matrix". The covariance of two variable $a$ and $b$ over $N$ values $a_i,b_i, i=1...N$ is given by $c(a,b) = \frac{1}{N}\sum_{i=1}^{N}[(a_i-\mu_a)(b_i-\mu_b)^T]$ is a measure of the linear relationship between two variables - in our case two dimensions of $\mathbf x$ or two of our features. Covariance will be high (positive) if increase in values of one variable above its mean correlates with increase in values of the other variable above the other variable's mean value. Covariance will be high (negative) if increase in values of one variable above its mean correlates with decrease in values of the other variable below the other variable's mean value. Covariance will be low (small positive or negative) if increase in values of one variable above its mean has little effect or little correlation with increase in values of the other variable above the other variable's mean value. In our example below, we take two variables, height and weight of a person which are expected to be correlated and exhibit high covariance. It is interesting to note that if we take a single variable $b=a$ then variance becomes covariance. A covariance matrix of $d$ variables is a $d \times d$ matrix of all pairwise covariances. Note that the covariance matrix will be symmetric since $cov(a,b)=cov(b,a)$.  It is typically better to scale the variables to the same range prior to covariance calculation to reduce effects of differences in range of values from affecting the covariance value. This can be achieved by subtracting the value of a variable from its mean and dividing by its standard deviation in a process called mean-standard deviation normalization (or standardization).
 # 
@@ -45,7 +55,7 @@
 # 
 # To gain further understanding of the concepts discussed so far, let's generate some data.
 
-# In[201]:
+# In[52]:
 
 
 import numpy as np
@@ -55,7 +65,7 @@ heights = np.array([56, 73, 60, 54, 56, 62, 77, 73, 72, 69, 74, 67, 84,])
 
 # And plot it!
 
-# In[202]:
+# In[53]:
 
 
 import matplotlib.pyplot as plt
@@ -69,10 +79,12 @@ plt.show()
 
 # Let's make the data into a numpy array and get the mean and standard deviation of the data so we can normalize it to have zero mean and unit standard deviation (variance) along each dimension.
 
-# In[203]:
+# In[54]:
 
 
 X = np.vstack((heights,weights)).T
+#X = np.random.randn(100,2)
+#X[:,1]+=0.5*X[:,0]
 N,d = X.shape
 print("The dimensions of X are",X.shape)
 Xm = np.mean(X,axis=0)
@@ -81,7 +93,7 @@ print("The mean is",Xm)
 print("The standard deviation is",Xs)
 
 
-# In[204]:
+# In[55]:
 
 
 Xn = (X-Xm)/(Xs)
@@ -93,7 +105,7 @@ print("Total Variance after normalization", np.sum(np.var(Xn,axis=0)))
 
 # Note that the total variance along both directions is 2.0. Let's plot the data. Notice that the trend of the data is the same whereas the mean has been changed to zero and standard deviation changed to one which is equivalent to a shifting and scaling of the data.
 
-# In[205]:
+# In[56]:
 
 
 plt.scatter(Xn[:,0],Xn[:,1])
@@ -105,7 +117,7 @@ plt.show()
 
 # Let's calculate the Covariance matrix. Note that the covariance matrix is symmetric and positive semi-definite (has non-negative eigen values). In the first reading of the tutorial, ignore the code below that corresponds to the snapshot variable being True.
 
-# In[206]:
+# In[57]:
 
 
 snapshot = False #See details on the Snapshot method below 
@@ -123,7 +135,7 @@ print("Covariance matrix is\n",C)
 # 
 # Let's calculate the eigen values and principal components. Once a principal component $\mathbf w$ has been calculated, we can project our data along it by $z = \mathbf w^T \mathbf x$ or in matrix form $\mathbf X_{n_{(N \times d)}}\mathbf W_{(d \times d)}$, where, $\mathbf W$ is the matrix of principal components.  We can then sort the principal components in descending order with respect to the amount of variance captured along those principle components. We will also plot the scree graph which plots the fraction of variance captured along each dimension.
 
-# In[209]:
+# In[58]:
 
 
 ev,pc = np.linalg.eig(C)
@@ -185,7 +197,7 @@ plt.show()
 # 7. The eigen values correspond to the amount of captured variance: The fraction of variance captured along a direction is exactly equal to the fraction of eigen values. Thus, the first principal component corresponds to the largest eigen value and so on.
 # 8. The plot of the fraction of captured variance upto $k$ principal components (called the scree plot) can be used to select how many principal components to retain when reducing dimensionality. For the original data used in this example, upto 95% variance is along the first principal component. Therefore, if the second principal component is dropped, the loss of information will be only ~5%.
 
-# In[210]:
+# In[59]:
 
 
 pc1 = pc[:,0]
@@ -198,7 +210,7 @@ print("The principle component matrix multiple by its transpose:\n",np.dot(pc.T,
 
 # Let's reduce the dimensionlity to "$d_r$" dimensions. Note that the projection is $ z = \mathbf w_{{(d \times 1)}}^T\mathbf x_{(d \times 1)}$ which, can be written as the matrix operation: $\mathbf Z_{(N \times d_r)} = \mathbf X_{{(N \times d)}}\mathbf W_{(d \times d_r)}$
 
-# In[211]:
+# In[60]:
 
 
 dr = 1
@@ -212,7 +224,7 @@ print("Fraction of variance captured along the projections: ",np.var(Z,axis=0)/n
 
 # Let's calculate the direction of maximum variance using a simple for-loop-based search to verify that we have actually found the correct answer. We will generate unit vectors along a unit circle and calculate the variance of the data after projection along a given vector. We show the scatter plot of the data overlayed by projections vectors whose length has been set equal to the variance of the data projected in that direction. We will also plot the variance vs. the angle/direction of the unit vector. Note that the highest standard deviation corresponds to the first eigen vectors.
 
-# In[212]:
+# In[61]:
 
 
 import numpy as np
@@ -254,7 +266,7 @@ print("Direction of Maximum Variance:",best_w)
 
 # Now, Let's calculate the inverse projection. Note that, the projections can be written as $\mathbf z_{(d \times 1)} = \mathbf W_{(d \times d)}^T \mathbf x_{(d \times 1)}$, therefore, the inverse projection (re-projection) can be written as $\mathbf x^r_{(d \times 1)} = \mathbf {W}^{-1} \mathbf z_{(d \times 1)}$. We already know that $\mathbf {W}^{-1} = \mathbf {W}^{T}$. We can use this to calculate the inverse transform using $\mathbf x^r_{(d \times 1)} = \mathbf {W}^{-1} \mathbf z_{(d_r \times 1)} = \mathbf {W}^{T}_{(d \times d_r)} \mathbf z_{(d_r \times 1)} $. In matrix form we have $\mathbf X^r = \mathbf Z \mathbf W^T=\mathbf X \mathbf W \mathbf W^T$. We will de-normalize the data by multiplying the vector of standard deviations and adding the mean vector. We then plot the re-projected points.
 
-# In[213]:
+# In[62]:
 
 
 iW = W.T
@@ -284,11 +296,11 @@ plt.show()
 # $\mathbf W^T \mathbf W = \mathbf I$.
 # 
 
-# In[214]:
+# In[63]:
 
 
 print("Average Reconstruction Error over normalized data: ",np.mean(np.linalg.norm(np.dot(Z,iW)-Xn,axis=1)**2))
-print("Difference between total variance and variance along projection:",np.sum(np.var(Xn,axis=0))-np.sum(np.var(z,axis=0)))
+print("Difference between total variance and variance along projection:",np.sum(np.var(Xn,axis=0))-np.sum(np.var(Z,axis=0)))
 
 
 # As discussed earlier, the reconstruction error is equal to the variance that is lost due to projection. In other words, PCA can be interpreted as: 1) Projecting the data along the direction of maximum variance, or equivalently, 2) Projecting the data along the direction in which re-projection error is minimized. Thus, the loss function for PCA is the re-projection error which is equivalent to negative of the amount of captured variance.
@@ -337,7 +349,7 @@ print("Difference between total variance and variance along projection:",np.sum(
 
 # Let's load the data using sklearn.
 
-# In[215]:
+# In[64]:
 
 
 from sklearn.datasets import load_digits
@@ -351,7 +363,7 @@ digits.data.shape
 # 
 # How many components are required for near perfect reconstruction?
 
-# In[216]:
+# In[65]:
 
 
 from sklearn.decomposition import PCA #import PCA
@@ -371,7 +383,7 @@ plt.show()
 
 # Let's show the original data and the projected data as images. We take two arbitrary digits and see the effect of applying PCA. Note that the projected digits look nothing like the original ones but are definitely different from each other. Note that the projected digits have a large number of dimensions equal to zero.
 
-# In[217]:
+# In[66]:
 
 
 plt.imshow(digits.data[0,:].reshape(8,8),cmap='gray'); plt.title('Original'); plt.colorbar(); plt.show()
@@ -390,7 +402,7 @@ plt.imshow(projected[900,:].reshape(8,8),cmap='gray'); plt.title('After PCA');  
 # 
 # Can you find the principal components that provide the best separation between classes?
 
-# In[218]:
+# In[67]:
 
 
 i1 = 0 #first principal component
@@ -407,7 +419,7 @@ plt.show()
 
 # Note that the principal components are 64 dimensional vectors which can be viewed as digits. Below, we show the two principal components selected above and the principal component correspondng to lowest variance. These images show us what kind of patterns are being learned. Notice that the outer boundary is zero for all principal components because no digits occur there so the image can easily be reduced in dimensions.
 
-# In[219]:
+# In[68]:
 
 
 plt.imshow(pca64.components_[i1,:].reshape(8,8),cmap='gray'); plt.title('PC1'); plt.colorbar(); plt.show()
@@ -422,7 +434,7 @@ plt.imshow(pca64.components_[-1,:].reshape(8,8),cmap='gray'); plt.title('Last PC
 # 
 # See what is the effect of changing the number of dimensions or reconstruction accuracy? 
 
-# In[220]:
+# In[69]:
 
 
 dr = 4
